@@ -72,15 +72,6 @@ Unique Reach	Unique audience coverage	Avoiding overlap when targeting new users
 Flow Centrality	Measures brokerage power	Identifying key connectors whose removal would fragment the network
 
 5. Time Complexity
-
-Adding user/referral: O(1) for insertion + O(V+E) for cycle check.
-BFS reach: O(V+E)
-Unique Reach Expansion: O(V × (V+E))
-Flow Centrality: O(V × (V × (V+E))) worst case.
-Simulation: O(days)
-Bonus search: O(log(max_bonus/10) × days)
-
-5. Time Complexity
 Adding user/referral: O(1) for insertion + O(V+E) for cycle check.
 
 BFS reach: O(V+E)
