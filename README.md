@@ -29,7 +29,7 @@ The visual banners above represent the **graph-based referral portal** with anal
 - **Testing Framework:** Jest
 - **Runtime Requirements:** None — runs directly with Node.js.
 
-### Install Dependencies
+1. **Install Dependencies**
 npm install
 
 This will install Jest and all other dependencies declared in package.json.
@@ -40,8 +40,7 @@ npm test
 
 This runs the full test suite and verifies that your local environment is correctly set up.
 
-2. Design Choices
-Part 1 – Data Structure
+2. **Design Choices**
 
 Choice: Directed Acyclic Graph (DAG) stored as a Map<string, Set<string>>.
 
@@ -49,8 +48,7 @@ Reasoning: O(1) add/lookups, no duplicates, fast traversal, simple cycle detecti
 
 Rules enforced: No self-referrals, unique referrer per candidate, acyclic structure.
 
-3. Top Referrers by Reach
-
+3. **Top Referrers by Reach**
 Method: getTopReferrersByReach(k)
 
 How to choose k:
@@ -61,7 +59,7 @@ Small k (e.g., 3–10) for leaderboard display.
 
 Larger k (e.g., 20+) for analytics dashboards or reports.
 
-4. Metric Comparison
+4. **Metric Comparison**
 
 Metric	Description	Best Use Case
 
@@ -71,7 +69,7 @@ Unique Reach	Unique audience coverage	Avoiding overlap when targeting new users
 
 Flow Centrality	Measures brokerage power	Identifying key connectors whose removal would fragment the network
 
-5. Time Complexity
+5. **Time Complexity**
 Adding user/referral: O(1) for insertion + O(V+E) for cycle check.
 
 BFS reach: O(V+E)
