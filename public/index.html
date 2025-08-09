@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mercor Dashboard — Referral Network</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://unpkg.com/cytoscape@3.24.2/dist/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-br from-[#05060a] to-[#07121a] text-slate-100 antialiased">
+  <div class="min-h-screen flex flex-col">
+    <!-- TOP BAR -->
+    <header class="flex items-center justify-between px-6 py-3 border-b border-slate-800">
+      <div class="flex items-center gap-4">
+        <!-- Image logo (external) -->
+        <img src="https://images.unsplash.com/photo-1593642532400-2682810df593?q=80&w=64&auto=format&fit=crop&ixlib=rb-4.0.3&s=7e2a8c0d4b3b8b6a4f8e9a3e7a2c6d5e" alt="Mercor" class="w-10 h-10 rounded-md object-cover"/>
+        <div>
+          <div class="text-lg font-semibold">Mercor</div>
+          <div class="text-xs text-slate-400">Referral Network</div>
+        </div>
+
+        <div class="ml-6 flex items-center gap-3">
+          <label class="text-sm text-slate-400">p</label>
+          <input id="pSlider" type="range" min="0" max="1" step="0.01" value="0.10" class="w-48"/>
+          <span id="pVal" class="w-12 text-sm">0.10</span>
+          <label class="text-sm text-slate-400">Days</label>
+          <input id="daysInput" type="number" value="30" min="1" class="w-20 px-2 py-1 rounded bg-slate-800 text-slate-100"/>
+          <button id="runSim" class="ml-2 px-3 py-2 rounded bg-gradient-to-r from-indigo-500 to-sky-400 text-white shadow">Run Simulation</button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Quick Actions top -->
+        <button id="refreshGraphTop" class="px-3 py-2 rounded bg-slate-800">Refresh Graph</button>
+        <button id="openAddUserTop" class="px-3 py-2 rounded bg-indigo-600">+ Add user</button>
+        <button id="exportUsersCsv" class="px-3 py-2 rounded bg-sky-600">Export CSV</button>
+
+        <!-- Stats -->
+        <div id="topStats" class="ml-4 flex gap-4 text-sm text-slate-300"></div>
+      </div>
+    </header>
+
+    <div class="flex-1 p-6">
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2 bg-[rgba(255,255,255,0.02)] rounded-lg p-4 shadow-lg relative">
+          <div id="cy" class="rounded h-[420px]"></div>
+          <div id="legendSmall" class="absolute left-6 bottom-6 flex items-center gap-3">
+            <div class="h-2 w-40 rounded bg-gradient-to-r from-sky-500 via-indigo-500 to-rose-400 shadow-inner"></div>
+            <div class="text-xs text-slate-400">Low</div>
+            <div class="text-xs text-slate-400">High</div>
+          </div>
+        </div>
+
+        <aside class="bg-[rgba(255,255,255,0.02)] rounded-lg p-4 shadow-lg">
+          <div id="selectedTitle" class="font-semibold text-lg">Select a node</div>
+          <div id="selectedMeta" class="text-sm text-slate-400 mt-2">Node details will appear here</div>
+
+          <div class="mt-4">
+            <div class="tabs flex gap-2">
+              <button data-tab="reach" class="tab-btn active">Reach</button>
+              <button data-tab="unique" class="tab-btn">Unique</button>
+              <button data-tab="flow" class="tab-btn">Flow</button>
+            </div>
+
+            <div id="tabReach" class="mt-3 tab-panel">
+              <h4 class="text-sm text-slate-400">Direct</h4>
+              <ul id="directList" class="mt-2 space-y-2"></ul>
+              <h4 class="text-sm text-slate-400 mt-4">Reach</h4>
+              <div id="reachCount" class="text-2xl font-bold mt-1">0</div>
+              <div class="mt-3">
+                <button id="markSelected" class="px-3 py-2 rounded bg-emerald-600 text-white">Mark Selected</button>
+              </div>
+            </div>
+
+            <div id="tabUnique" class="mt-3 tab-panel hidden">
+              <div id="uniqueList" class="space-y-2 text-sm text-slate-200"></div>
+            </div>
+
+            <div id="tabFlow" class="mt-3 tab-panel hidden">
+              <div id="flowList" class="space-y-2 text-sm text-slate-200"></div>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-2">
+            <div class="text-sm text-slate-400">Add referral (from selected)</div>
+            <form id="addReferralForm" class="flex gap-2 mt-2">
+              <input id="candidateId" type="number" placeholder="candidate id" class="flex-1 px-3 py-2 rounded bg-slate-800"/>
+              <button class="px-3 py-2 rounded bg-indigo-600">Add</button>
+            </form>
+            <div id="addRefMsg" class="text-sm text-slate-400 mt-1"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="mt-6 grid grid-cols-3 gap-4">
+        <div class="col-span-2 bg-[rgba(255,255,255,0.02)] rounded-lg p-4">
+          <canvas id="dailyChart" height="120"></canvas>
+          <canvas id="simChart" height="140" class="mt-4"></canvas>
+          <div class="flex justify-between items-center mt-4">
+            <div id="liveCounter" class="text-2xl font-bold"></div>
+            <div class="flex gap-2">
+              <button id="replayBtn" class="px-3 py-2 rounded bg-emerald-600">Replay</button>
+              <button id="exportCSV" class="px-3 py-2 rounded bg-slate-700">Export Simulation CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[rgba(255,255,255,0.02)] rounded-lg p-4">
+          <h3 class="font-semibold">Leaderboard</h3>
+          <div id="leaderboard" class="mt-3 space-y-2 text-sm"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add user modal -->
+    <div id="addUserModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+      <div class="absolute inset-0 bg-black/60"></div>
+      <div class="relative bg-slate-900 rounded-xl p-6 w-[420px] shadow-xl">
+        <button id="closeAddUser" class="absolute right-4 top-4 text-slate-400">✕</button>
+        <h3 class="text-xl font-bold">Add new user</h3>
+        <form id="addUserForm" class="mt-4 space-y-3">
+          <input id="newName" class="w-full px-3 py-2 rounded bg-slate-800" placeholder="Name" required />
+          <input id="newEmail" class="w-full px-3 py-2 rounded bg-slate-800" placeholder="Email (optional)" />
+          <select id="newGender" class="w-full px-3 py-2 rounded bg-slate-800">
+            <option value="">Prefer not to say</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="flex justify-end">
+            <button type="submit" class="px-4 py-2 rounded bg-indigo-600">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+  </div>
+</body>
+</html>

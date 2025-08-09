@@ -1,0 +1,22 @@
+/* public/css/styles.css */
+/* helper classes used in HTML (via @apply from Tailwind) */
+.side-btn {
+  @apply w-full text-left px-3 py-2 rounded-md text-slate-200 hover:bg-slate-800;
+}
+.side-btn.active {
+  @apply bg-gradient-to-r from-indigo-600 to-sky-500 shadow text-white;
+}
+.tab-btn {
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #9aa6b2;
+}
+.tab-btn.active {
+  background: linear-gradient(90deg,#0f1720,#081226);
+  color: #fff;
+  border: 1px solid rgba(124,92,255,0.14);
+}
+/* minor utilities */
+#cy { width:100%; height:100%; transition: all .3s ease; }
+canvas { background: transparent; }
