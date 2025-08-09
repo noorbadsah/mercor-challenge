@@ -117,7 +117,7 @@ Approx. **7–8 hours** in total:
 - Part 5: ~1.5 hours (bonus optimization)  
 - Testing & documentation: ~1 hour  
 
----
+--- 
 
 ## 8. AI Tools Usage
 AI assistants (ChatGPT) were used only for:  
